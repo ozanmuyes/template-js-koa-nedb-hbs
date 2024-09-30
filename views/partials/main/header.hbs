@@ -1,0 +1,25 @@
+<header style="display: flex;">
+  <div>
+    {{!-- TODO hamburger icon (_for mobile_) --}}
+  </div>
+  <div>
+    <nav>
+      <ul>
+        <li><a href="/">Index</a></li>
+        <li><a href="/public">Public</a></li>
+        <li><a href="/private">Private</a></li>
+
+        {{#if user}}
+        {{!-- <li><a href="/logout">Logout</a></li> --}}
+        <li>
+          <form action="/logout" method="post">
+            <input type="submit" value="Logout">
+          </form>
+        </li>
+        {{else}}
+        <li><a href="/login">Login</a></li>
+        {{/if}}
+      </ul>
+    </nav>
+  </div>
+</header>

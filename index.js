@@ -8,7 +8,7 @@ import bodyParser from "koa-bodyparser";
 import session from "koa-session";
 import serve from "koa-static";
 import Datastore from "nedb";
-import handlebars from "koa-handlebars";
+import hbs from "koa-hbs";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 
@@ -28,10 +28,27 @@ const repoUsers = new Datastore({
 
 // #region Middlewares
 
+/**
+ * @param {string | undefined} redirUrl
+ */
 function requireAuthentication(redirUrl) {
   return async function _requireAuthentication(ctx, next) {
+    // ?FIXME `/login?redir=/login` olunca TOO_MANY_REDIRECTS
     if (!ctx.session.user) {
-      ctx.redirect(`/login?redir=${redirUrl ?? ctx.routerPath}`);
+      // if (redirUrl && !redirUrl.startsWith("/login")) {
+      //   ctx.redirect(`/login?redir=${redirUrl}`);
+      // } else {
+      //   ctx.redirect(`/login`); // TODO BU DOĞRU MU KONTROL ET
+      // }
+      if (redirUrl) {
+        if (redirUrl.startsWith("/login")) {
+          ctx.redirect(`/login`); // TODO BU DOĞRU MU KONTROL ET
+        } else {
+          ctx.redirect(`/login?redir=${redirUrl}`);
+        }
+      } else {
+        ctx.redirect(`/login?redir=${ctx.originalUrl}`);
+      }
     } else {
       await next();
     }
@@ -87,6 +104,7 @@ router.get("/dev-live-reload.js", async (ctx, next) => {
 
 router.get("/", async (ctx, next) => {
   await ctx.render("index", {
+    user: ctx.session.user,
     title: "Index Page",
   });
 
@@ -95,13 +113,14 @@ router.get("/", async (ctx, next) => {
 
 router.get("/public", async (ctx, next) => {
   await ctx.render("public", {
+    user: ctx.session.user,
     title: "Public Page",
   });
 
   await next();
 });
 
-router.get("/login", async (ctx, next) => {
+router.get("/login", requireNoAuthentication(), async (ctx, next) => {
   if (ctx.session.user) {
     ctx.redirect("back", "/");
 
@@ -122,7 +141,8 @@ const schemaPostLogin = z.object({
 });
 router.post(
   "/login",
-  requireNoAuthentication("back"),
+  // requireNoAuthentication("back"),
+  requireNoAuthentication("/"),
   bodyParser(),
   async (ctx, next) => {
     const { username, password } = schemaPostLogin.parse(ctx.request.body);
@@ -163,8 +183,8 @@ router.post(
 
 router.get("/private", requireAuthentication(), async (ctx, next) => {
   await ctx.render("private", {
+    user: ctx.session.user,
     title: "Private Page",
-    username: ctx.session.user.username,
   });
 
   await next();
@@ -211,8 +231,12 @@ router.post("/logout", requireAuthentication("/login"), async (ctx, next) => {
   // #region Register Middlewares
 
   app.use(
-    handlebars({
+    hbs.middleware({
+      viewPath: path.join(import.meta.dirname, "views", "pages"),
+      partialsPath: path.join(import.meta.dirname, "views", "partials"),
       defaultLayout: "main",
+      layoutsPath: path.join(import.meta.dirname, "views", "layouts"),
+      disableCache: IS_DEV,
     }),
   );
 
@@ -236,6 +260,8 @@ router.post("/logout", requireAuthentication("/login"), async (ctx, next) => {
       app,
     ),
   );
+
+  app.use(serve("public", { maxage: STATIC_FILES_MAXAGE }));
 
   //
 

@@ -23,7 +23,6 @@
       "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/nodemon",
       "runtimeArgs": [
         "--ext", "js",
-        "--ext", "hbs"
       ],
       "program": "${workspaceFolder}/index.js",
       "restart": true,
