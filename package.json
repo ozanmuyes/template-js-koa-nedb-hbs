@@ -1,0 +1,36 @@
+{
+  "name": "template-js-koa-nedb-hbs",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./index.js",
+    "watch": "nodemon --ext js --ignore ./public/ ./index.js"
+  },
+  "keywords": [],
+  "author": "Ozan Müyesseroğlu <ozanmuyes@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "@eslint/js": "^9.11.1",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "eslint": "^9.11.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "nodemon": "^3.1.7",
+    "prettier": "^3.3.3",
+    "ws": "^8.18.0"
+  },
+  "dependencies": {
+    "@koa/router": "^13.1.0",
+    "bcrypt": "^5.1.1",
+    "koa": "^2.15.3",
+    "koa-bodyparser": "^4.4.1",
+    "koa-hbs": "^0.9.0",
+    "koa-session": "^6.4.0",
+    "koa-static": "^5.0.0",
+    "nedb": "^1.8.0",
+    "zod": "^3.23.8"
+  }
+}

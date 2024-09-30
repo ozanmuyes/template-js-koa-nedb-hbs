@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "andrejunges.handlebars",
+    "dbaeumer.vscode-eslint"
+  ]
+}
